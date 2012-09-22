@@ -6,20 +6,22 @@ import org.slf4j.LoggerFactory
 
 class RatpackApp {
 
-	final logger = LoggerFactory.getLogger(getClass())
-
-    def handlers = [
-        'GET': new RoutingTable(),
-        'POST': new RoutingTable(),
-    ]
+    final logger = LoggerFactory.getLogger(getClass())
 
     def config = [
         port: 5000,
-        templateRoot: 'templates'
+        templateRoot: 'templates',
+        delegateClassName : 'com.bleedingwolf.ratpack.RatpackRequestDelegate'
     ]
+    
+    def handlers = [:]
 
     def set = { setting, value ->
         config[setting] = value
+    }
+
+    def delegate = { delegateClassName ->
+        config['delegateClassName'] = delegateClassName
     }
 
     void register(List methods, path, handler) {
@@ -37,7 +39,7 @@ class RatpackApp {
 
         def routingTable = handlers[method]
         if(routingTable == null) {
-            routingTable = new RoutingTable()
+            routingTable = new RoutingTable(config['delegateClassName'])
             handlers[method] = routingTable
         }
         routingTable.attachRoute path, handler
@@ -76,6 +78,7 @@ class RatpackApp {
         binding.setVariable('put', app.put)
         binding.setVariable('delete', app.delete)
         binding.setVariable('set', app.set)
+        binding.setVariable('delegate', app.delegate)
         gse.run scriptFile.name, binding
     }
 }
