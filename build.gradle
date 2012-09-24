@@ -6,7 +6,8 @@ apply plugin: 'signing'
 
 group = 'com.augusttechgroup'
 artifact = 'ratpack-core'
-version = '0.5'
+version = '0.6-SNAPSHOT'
+doSign = false
 
 repositories {
   mavenCentral()
@@ -79,6 +80,7 @@ artifacts {
 }
 
 signing {
+  required { doSign }
   sign configurations.archives
 }
 
